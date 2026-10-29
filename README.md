@@ -7,6 +7,11 @@ Demostración de seguimiento de encargos para una imprenta digital que trabaja c
 
 > **Demostración:** los datos se guardan únicamente en este navegador; los enlaces y los avisos son simulados. No usar con datos reales.
 
+## Dónde verla
+
+- **Demo publicada:** https://print-order-peek.lovable.app — el panel en la raíz y la consulta del cliente en `/e/<código>`.
+- **Código:** https://github.com/Vanessa-Arjona/Seguimiento-Imprenta (rama `main`).
+
 ## Guía de uso
 
 1. Abra el **Panel de la imprenta**. La primera vez aparecen cuatro encargos de ejemplo ficticios (dominios `.example`, teléfonos marcados como «ficticio»).
