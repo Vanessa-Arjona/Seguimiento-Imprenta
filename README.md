@@ -12,15 +12,44 @@ Demostración de seguimiento de encargos para una imprenta digital que trabaja c
 - **Demo publicada:** https://print-order-peek.lovable.app — el panel en la raíz y la consulta del cliente en `/e/<código>`.
 - **Código:** https://github.com/Vanessa-Arjona/Seguimiento-Imprenta (rama `main`).
 
+## Arranque local
+
+Requisitos: [Bun](https://bun.sh) (o Node.js 20+ con npm).
+
+```bash
+bun install        # instalar dependencias
+bun run dev        # servidor de desarrollo (Vite); abra la URL que muestra la consola
+bun run build      # compilación de producción
+bun run preview    # servir localmente la compilación
+bun run test       # pruebas (Vitest)
+bun run lint       # revisión de código (ESLint)
+```
+
+Con npm: `npm install` y `npm run dev` (mismos nombres de script).
+
+## Reiniciar los datos de ejemplo
+
+**Atención: se pierden todos los encargos, estados, avisos y respuestas creados en ese navegador, y los enlaces de cliente dejan de funcionar.**
+
+1. Abra el panel y las herramientas de desarrollo del navegador (F12) → Consola.
+2. Ejecute:
+   ```js
+   localStorage.removeItem("imprenta-orders-v2"); localStorage.removeItem("imprenta-stages-v1"); location.reload();
+   ```
+3. Al recargar se crean de nuevo los cuatro encargos de ejemplo y los estados por defecto, con enlaces nuevos.
+
+Alternativa: borrar los datos del sitio en la configuración del navegador.
+
 ## Guía de uso
 
-1. Abra el **Panel de la imprenta**. La primera vez aparecen cuatro encargos de ejemplo ficticios (dominios `.example`, teléfonos marcados como «ficticio»).
+1. Abra el **Panel de la imprenta**. La primera vez aparecen cuatro encargos de ejemplo ficticios (correos `@example.com`, teléfonos marcados como «ficticio»).
 2. **Crear un encargo:** pulse «+ Nuevo encargo», complete empresa, producto, cantidad, fecha prevista y contacto de la imprenta. El correo del cliente y la nota son opcionales. Si falta algo, el formulario indica qué corregir.
-3. **Cambiar estado:** pulse un encargo, elija el nuevo estado, escriba una nota si quiere y pulse «Guardar». El cambio queda en el **Historial** con fecha y hora.
-4. **Avisos:** cada creación o cambio de estado genera un aviso en la pestaña «Avisos» del encargo, marcado «Simulado · no enviado». No se envía ningún correo.
-5. **Enlace del cliente:** «Copiar enlace privado» copia el enlace (si el navegador lo impide, se muestra un mensaje con el enlace para copiarlo a mano). «Ver como cliente» abre la consulta.
-6. **Estados:** en la pestaña «Estados» puede añadir estados, renombrarlos, reordenarlos con ↑/↓ y escribir el texto del aviso de cada uno. El primero se asigna a los encargos nuevos; el último cierra el encargo. No se permiten nombres vacíos ni repetidos. No se pueden borrar estados (fuera del alcance).
-7. **Consulta del cliente:** muestra estado actual, progreso, fecha prevista, línea de tiempo y contacto. Al llegar al último estado aparece la pregunta de satisfacción (1 a 5 y comentario opcional), que se responde una sola vez.
+3. **Buscar:** el buscador filtra por empresa, producto o identificador (p. ej. «ENC-1042»), sin distinguir mayúsculas ni tildes, y se combina con los filtros de estado.
+4. **Cambiar estado:** pulse un encargo, elija el nuevo estado, escriba una nota si quiere y pulse «Guardar». El cambio queda en el **Historial** con fecha y hora.
+5. **Avisos:** cada creación o cambio de estado genera un aviso en la pestaña «Avisos» del encargo, marcado «Simulado · no enviado». No se envía ningún correo.
+6. **Enlace del cliente:** «Copiar enlace privado» copia el enlace (si el navegador lo impide, se muestra un mensaje con el enlace para copiarlo a mano). «Ver como cliente» abre la consulta.
+7. **Estados:** en la pestaña «Estados» puede añadir estados, renombrarlos, reordenarlos con ↑/↓ y escribir el texto del aviso de cada uno. El primero se asigna a los encargos nuevos; el último cierra el encargo. No se permiten nombres vacíos ni repetidos. No se pueden borrar estados (fuera del alcance).
+8. **Consulta del cliente:** muestra estado actual, progreso, fecha prevista, línea de tiempo y contacto. Al llegar al último estado aparece la pregunta de satisfacción (1 a 5 y comentario opcional), que se responde una sola vez.
 
 ## Limitaciones técnicas
 
@@ -31,7 +60,7 @@ Demostración de seguimiento de encargos para una imprenta digital que trabaja c
 
 ## Pruebas
 
-- `bun run test` (Vitest): creación de enlaces, formato de enlace, cambio de estado con historial y aviso simulado, validación del formulario, nombres de estado y reparación de estados guardados.
+- `bun run test` (Vitest): creación de enlaces, formato de enlace, cambio de estado con historial y aviso simulado, validación del formulario, buscador combinado con filtro de estado, nombres de estado y reparación de estados guardados.
 - Revisión manual en navegador con pantalla de móvil (390 px).
 - No se ha medido el rendimiento en dispositivos móviles reales.
 
