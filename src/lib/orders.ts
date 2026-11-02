@@ -60,13 +60,13 @@ const KEY = "imprenta-orders-v2";
 export const DEFAULT_CONTACT: Contact = {
   name: "Contacto de demostración (ficticio)",
   phone: "+598 0000 0000 (ficticio)",
-  email: "encargos@imprenta.example",
+  email: "encargos.imprenta@example.com",
 };
 
 function seed(): Order[] {
   return [
     {
-      token: "a7k2m9xq4p", code: "ENC-1042", clientEmail: "pedidos@cafe-demo.example", company: "Café Demo (ficticio)", product: "Tarjetas de visita 350 g mate, laminado soft-touch", quantity: 1000, dueDate: "2026-11-04", stage: "impresión", contact: DEFAULT_CONTACT,
+      token: "a7k2m9xq4p", code: "ENC-1042", clientEmail: "pedidos.cafe@example.com", company: "Café Demo (ficticio)", product: "Tarjetas de visita 350 g mate, laminado soft-touch", quantity: 1000, dueDate: "2026-11-04", stage: "impresión", contact: DEFAULT_CONTACT,
       history: [
         { at: "2026-10-26T09:12:00", stage: "recibido", note: "Archivos recibidos en PDF/X-4." },
         { at: "2026-10-27T11:40:00", stage: "diseño", note: "Ajustado sangrado a 3 mm." },
@@ -74,15 +74,15 @@ function seed(): Order[] {
       ],
     },
     {
-      token: "r3t8w1zn6c", code: "ENC-1043", clientEmail: "marketing@clinica-demo.example", company: "Clínica Demo (ficticia)", product: "Folletos A5 a doble cara, estucado brillo 135 g", quantity: 2500, dueDate: "2026-11-06", stage: "diseño",
-      contact: { name: "Producción · demostración (ficticio)", phone: "+598 0000 0001 (ficticio)", email: "produccion@imprenta.example" },
+      token: "r3t8w1zn6c", code: "ENC-1043", clientEmail: "marketing.clinica@example.com", company: "Clínica Demo (ficticia)", product: "Folletos A5 a doble cara, estucado brillo 135 g", quantity: 2500, dueDate: "2026-11-06", stage: "diseño",
+      contact: { name: "Producción · demostración (ficticio)", phone: "+598 0000 0001 (ficticio)", email: "produccion.imprenta@example.com" },
       history: [
         { at: "2026-10-28T10:05:00", stage: "recibido" },
         { at: "2026-10-28T16:20:00", stage: "diseño", note: "Prueba digital enviada; pendiente de aprobación." },
       ],
     },
     {
-      token: "h5v0b2ly8s", code: "ENC-1044", clientEmail: "compras@logistica-demo.example", company: "Logística Demo (ficticia)", product: "Lona publicitaria 300×100 cm con ollaos", quantity: 2, dueDate: "2026-10-30", stage: "listo", contact: DEFAULT_CONTACT,
+      token: "h5v0b2ly8s", code: "ENC-1044", clientEmail: "compras.logistica@example.com", company: "Logística Demo (ficticia)", product: "Lona publicitaria 300×100 cm con ollaos", quantity: 2, dueDate: "2026-10-30", stage: "listo", contact: DEFAULT_CONTACT,
       history: [
         { at: "2026-10-22T12:00:00", stage: "recibido" },
         { at: "2026-10-23T09:45:00", stage: "diseño" },
@@ -92,7 +92,7 @@ function seed(): Order[] {
       ],
     },
     {
-      token: "m8q4d6tf2w", code: "ENC-1041", clientEmail: "administracion@bodega-demo.example", company: "Bodega Demo (ficticia)", product: "Etiquetas adhesivas troqueladas para botella", quantity: 5000, dueDate: "2026-10-24", stage: "entregado", contact: DEFAULT_CONTACT,
+      token: "m8q4d6tf2w", code: "ENC-1041", clientEmail: "administracion.bodega@example.com", company: "Bodega Demo (ficticia)", product: "Etiquetas adhesivas troqueladas para botella", quantity: 5000, dueDate: "2026-10-24", stage: "entregado", contact: DEFAULT_CONTACT,
       history: [
         { at: "2026-10-14T09:00:00", stage: "recibido" },
         { at: "2026-10-15T10:30:00", stage: "diseño" },
@@ -237,4 +237,11 @@ export function validateOrderForm(f: OrderForm): string[] {
 export function nextOrderCode(orders: Order[]) {
   const nums = orders.map((o) => Number(o.code.split("-")[1])).filter((n) => Number.isFinite(n));
   return `ENC-${nums.length ? Math.max(...nums) + 1 : 1000}`;
+}
+
+/** Filters orders by stage ("todos" = any) and a free-text query on company, product or code (case- and accent-insensitive). */
+export function filterOrders(orders: Order[], stage: string, query: string): Order[] {
+  const norm = (s: string) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const q = norm(query.trim());
+  return orders.filter((o) => (stage === "todos" || o.stage === stage) && (!q || [o.company, o.product, o.code].some((f) => norm(f).includes(q))));
 }
