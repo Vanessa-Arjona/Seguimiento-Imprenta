@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { applyChange, isValidTokenFormat, newToken, nextOrderCode, normalizeStages, stageLabelProblem, validateOrderForm, type Order } from "@/lib/orders";
+import { applyChange, filterOrders, isValidTokenFormat, newToken, nextOrderCode, normalizeStages, stageLabelProblem, validateOrderForm, type Order } from "@/lib/orders";
 
 const stages = [{ id: "a", label: "Recibido" }, { id: "b", label: "Entregado" }];
-const base: Order = { token: newToken(), code: "ENC-1000", company: "X", product: "P", quantity: 1, dueDate: "2026-11-01", stage: "a", contact: { name: "n", phone: "1", email: "a@b.example" }, history: [], notices: [] };
-const form = { company: "X", clientEmail: "", product: "P", quantity: 10, dueDate: "2026-11-01", contactName: "n", contactPhone: "1", contactEmail: "a@b.example" };
+const base: Order = { token: newToken(), code: "ENC-1000", company: "X", product: "P", quantity: 1, dueDate: "2026-11-01", stage: "a", contact: { name: "n", phone: "1", email: "demo@example.com" }, history: [], notices: [] };
+const form = { company: "X", clientEmail: "", product: "P", quantity: 10, dueDate: "2026-11-01", contactName: "n", contactPhone: "1", contactEmail: "demo@example.com" };
 
 describe("orders", () => {
   it("tokens are 24 chars, random and valid", () => {
@@ -43,5 +43,16 @@ describe("orders", () => {
   it("next code ignores malformed codes", () => {
     expect(nextOrderCode([{ ...base, code: "ENC-1044" }, { ...base, code: "raro" }])).toBe("ENC-1045");
     expect(nextOrderCode([])).toBe("ENC-1000");
+  });
+  it("search matches company, product or code and combines with stage filter", () => {
+    const list = [
+      { ...base, code: "ENC-1042", company: "Café Demo", product: "Tarjetas", stage: "a" },
+      { ...base, code: "ENC-1043", company: "Clínica Demo", product: "Folletos", stage: "b" },
+    ];
+    expect(filterOrders(list, "todos", "cafe").map((o) => o.code)).toEqual(["ENC-1042"]);
+    expect(filterOrders(list, "todos", "folletos").map((o) => o.code)).toEqual(["ENC-1043"]);
+    expect(filterOrders(list, "todos", "enc-1043").map((o) => o.code)).toEqual(["ENC-1043"]);
+    expect(filterOrders(list, "a", "clinica")).toEqual([]);
+    expect(filterOrders(list, "b", "")).toHaveLength(1);
   });
 });
