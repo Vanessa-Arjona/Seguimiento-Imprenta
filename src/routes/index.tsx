@@ -4,6 +4,7 @@ import { DemoNotice } from "@/components/DemoNotice";
 import {
   loadOrders, saveOrders, newToken, nowLocal, formatDate, formatDateTime,
   loadStages, saveStages, applyChange, validateOrderForm, nextOrderCode, stageLabelProblem, DEFAULT_NOTICE, stageLabel, newStageId, DEFAULT_CONTACT, type Order, type Stage, type StageDef,
+  filterOrders,
 } from "@/lib/orders";
 
 export const Route = createFileRoute("/")({
@@ -30,6 +31,7 @@ function Index() {
   const [form, setForm] = useState(emptyForm);
   const [showForm, setShowForm] = useState(false);
   const [filter, setFilter] = useState<Stage | "todos">("todos");
+  const [query, setQuery] = useState("");
   const [stages, setStagesState] = useState<StageDef[]>([]);
   const [tab, setTab] = useState<"encargos" | "estados">("encargos");
 
@@ -56,8 +58,7 @@ function Index() {
   };
 
   const changeOrder = (o: Order) => update(orders.map((x) => (x.token === o.token ? o : x)));
-  const list = orders
-    .filter((o) => filter === "todos" || o.stage === filter)
+  const list = filterOrders(orders, filter, query)
     .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
 
   return (
@@ -110,6 +111,12 @@ function Index() {
           </form>
         )}
 
+        <div>
+          <label htmlFor="buscar" className="mb-1 block text-sm font-medium">Buscar encargos</label>
+          <input id="buscar" type="search" value={query} onChange={(e) => setQuery(e.target.value)}
+            placeholder="Empresa, producto o identificador (ENC-…)" className={input} />
+        </div>
+
         <div className="flex gap-2 overflow-x-auto pb-1 text-sm">
           {["todos", ...stages.map((x) => x.id)].map((s) => (
             <button key={s} onClick={() => setFilter(s)}
@@ -119,8 +126,8 @@ function Index() {
           ))}
         </div>
 
-        <section className="space-y-3">
-          {list.length === 0 && <p className="py-8 text-center text-sm text-muted-foreground">No hay encargos en este estado.</p>}
+        <section className="space-y-3" aria-live="polite">
+          {list.length === 0 && <p className="py-8 text-center text-sm text-muted-foreground">{query.trim() ? "Ningún encargo coincide con la búsqueda y el filtro seleccionados." : "No hay encargos en este estado."}</p>}
           {list.map((o) => <OrderCard key={o.token} order={o} stages={stages} onChange={changeOrder} />)}
         </section>
         </>}
